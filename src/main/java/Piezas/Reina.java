@@ -27,6 +27,7 @@ public class Reina extends Pieza {
 
     @Override
     public boolean esMovimientoValido(Pieza[][] tablero, Posicion nuevaPosicion) {
+            return color;
         
 
 

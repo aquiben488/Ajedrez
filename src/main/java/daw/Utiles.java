@@ -10,9 +10,36 @@ public class Utiles {
     // Devuleve todo el tablero en String, llama a el toString de la pieza 
     // que este en la posicon, si no pinta la casilla vacia(blanca o negra)
     // tambien añade las coordenadas (1-8 y a-h)
+     // Metodo original que muestra coordenadas de ajedrez (1-8, a-h)
+//     public static void toString(Pieza[][] tablero) throws Exception {
+//        StringBuilder sb = new StringBuilder();
+//        int notLat = 8;
+//
+//        for (int i = 0; i < tablero.length; i++) {
+//            for (int j = 0; j < tablero[i].length; j++) {
+//
+//                if (tablero[i][j] != null) {
+//                    sb.append(tablero[i][j]);
+//                } else {
+//                    if (celdaEsBlanca(i, j)) {
+//                        sb.append("X ");
+//                    } else {
+//                        sb.append("O ");
+//                    }
+//
+//                }
+//            }
+//            sb.append("  " + notLat);
+//            sb.append("\n");
+//            notLat--;
+//        }
+//        sb.append("\na b c d e f g h");
+//         soutUTF8(sb.toString());
+//    }
+
+     // Version que muestra coordenadas de la matriz
      public static void toString(Pieza[][] tablero) throws Exception {
         StringBuilder sb = new StringBuilder();
-        int notLat = 8;
 
         for (int i = 0; i < tablero.length; i++) {
             for (int j = 0; j < tablero[i].length; j++) {
@@ -28,11 +55,10 @@ public class Utiles {
 
                 }
             }
-            sb.append("  " + notLat);
+            sb.append("  " + i);
             sb.append("\n");
-            notLat--;
         }
-        sb.append("\na b c d e f g h");
+        sb.append("\n0 1 2 3 4 5 6 7");
          soutUTF8(sb.toString());
     }
     
