@@ -1,3 +1,4 @@
+ 
 package Piezas;
 
 // Pieza es una clase abtracta que sirve como plantilla para las demas piezas
@@ -72,10 +73,6 @@ public abstract class Pieza {
     
     @Override
     public abstract String toString();  
-    
-    public boolean getColor() {
-        return this.color;
-    }
     
 }
 
