@@ -32,16 +32,10 @@ public class Peon extends Pieza {
     @Override
     public boolean esMovimientoValido(Pieza[][] tablero, Posicion nuevaPosicion) {
 
-        if (estaClavada) {
-            //Si esta clavada no se puede mover 
-            return false;
-        } else if (!(nuevaPosicion.esValida())) {
-            // Esta fuera del tablero
-            return false;
-        } else if (this.posicion.equals(nuevaPosicion)) {
+        if (!movimientoFactible(nuevaPosicion)) {
             return false;
         }
-
+        
         // si llegamos aqui, en principio el movimiento es factible
         // no esta clavada, la posicion esta dentro del tablero y no es la misma 
         // en la que ya esta la propia pieza

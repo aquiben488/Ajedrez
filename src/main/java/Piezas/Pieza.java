@@ -74,6 +74,17 @@ public abstract class Pieza {
     @Override
     public abstract String toString();  
     
+    protected boolean movimientoFactible(Posicion nuevaPosicion) {
+        if (!(nuevaPosicion.esValida())) {
+            // Esta fuera del tablero
+            return false;
+        } else if (this.posicion.equals(nuevaPosicion)) {
+            // La posicion es la misma
+            return false;
+        }
+        return true;
+    }
+    
 }
 
 

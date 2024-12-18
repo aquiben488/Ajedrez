@@ -1,8 +1,42 @@
-
-
 package Piezas;
 
+import daw.Utiles;
+
 public class Caballo extends Pieza {
+
+    public static void main(String[] args) throws Exception {
+        Pieza[][] tablero = new Pieza[8][8];
+        
+        // Colocamos un caballo blanco en el centro
+        tablero[4][4] = new Caballo(true, 4, 4);
+        
+        // Piezas que puede comer (negras)
+        tablero[2][3] = new Peon(false, 2, 3);
+        tablero[6][5] = new Peon(false, 6, 5);
+        tablero[3][6] = new Peon(false, 3, 6);
+        
+        // Piezas que no puede comer (blancas)
+        tablero[2][5] = new Peon(true, 2, 5);
+        
+        Utiles.toString(tablero);
+        
+        // Probamos movimientos
+        Posicion pos1 = new Posicion(2, 3); // Movimiento válido - puede comer pieza negra
+        Posicion pos2 = new Posicion(2, 5); // Movimiento inválido - hay pieza blanca
+        Posicion pos3 = new Posicion(3, 2); // Movimiento válido en L a casilla vacía
+        Posicion pos4 = new Posicion(4, 6); // Movimiento inválido - no es en L
+        Posicion pos5 = new Posicion(8, 8); // Fuera del tablero
+        Posicion pos6 = new Posicion(6, 5); // Movimiento válido - puede comer pieza negra
+        Posicion pos7 = new Posicion(5, 6); // Movimiento válido en L a casilla vacía
+        
+        System.out.println("Movimiento a (2,3): " + tablero[4][4].esMovimientoValido(tablero, pos1) + " (debería ser true - puede comer pieza negra)");
+        System.out.println("Movimiento a (2,5): " + tablero[4][4].esMovimientoValido(tablero, pos2) + " (debería ser false - hay una pieza blanca)"); 
+        System.out.println("Movimiento a (3,2): " + tablero[4][4].esMovimientoValido(tablero, pos3) + " (debería ser true - movimiento en L válido)");
+        System.out.println("Movimiento a (4,6): " + tablero[4][4].esMovimientoValido(tablero, pos4) + " (debería ser false - no es movimiento en L)");
+        System.out.println("Movimiento a (8,8): " + tablero[4][4].esMovimientoValido(tablero, pos5) + " (debería ser false - fuera del tablero)");
+        System.out.println("Movimiento a (6,5): " + tablero[4][4].esMovimientoValido(tablero, pos6) + " (debería ser true - puede comer pieza negra)");
+        System.out.println("Movimiento a (5,6): " + tablero[4][4].esMovimientoValido(tablero, pos7) + " (debería ser true - movimiento en L válido)");
+    }
 
     public Caballo(boolean color, int fila, int columna) {
         super(color, fila, columna);
@@ -34,20 +68,13 @@ public class Caballo extends Pieza {
     @Override
     public boolean esMovimientoValido(Pieza[][] tablero, Posicion nuevaPosicion) {
         
-        int nuevaFila = nuevaPosicion.getFila();
-        int nuevaColumna = nuevaPosicion.getColumna();
-        
-        if (estaClavada) {
-            //Si esta clavada no se puede mover 
-            return false;
-        } else if (!(nuevaPosicion.esValida())) {
-            // Esta fuera del tablero
-            return false;
-        } else if (this.posicion.equals(nuevaPosicion)) {
-            // La posicion es la misma
+        if (!movimientoFactible(nuevaPosicion)) {
             return false;
         }
         
+        int nuevaFila = nuevaPosicion.getFila();
+        int nuevaColumna = nuevaPosicion.getColumna();
+
         // Si llega aqui el movimiento es factible, solo queda saber si es legal
         // Necesitamos saber si esta en L
         
@@ -55,8 +82,6 @@ public class Caballo extends Pieza {
         int diferenciaColumnas = nuevaPosicion.getColumna() - this.getColumna();
         int difColAbsoluta = Math.abs(diferenciaColumnas);
         int difFilAbsoluta = Math.abs(diferenciaFilas);
-        int columnaAComprobar;
-        int filaAComprobar;
         
         if (difColAbsoluta + difFilAbsoluta != 3) {
             // Si la suma de las diferencias es distinto de 3 

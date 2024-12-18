@@ -52,29 +52,17 @@ public class Alfil extends Pieza{
     // - No hay piezas en medio
     
     @Override
-    public boolean esMovimientoValido(Pieza[][] tablero,Posicion nuevaPosicion) {
+    public boolean esMovimientoValido(Pieza[][] tablero, Posicion nuevaPosicion) {
+        if (!movimientoFactible(nuevaPosicion)) {
+            return false;
+        }
         
         int diferenciaFil = nuevaPosicion.getFila() - this.getFila();
         int diferenciaCol = nuevaPosicion.getColumna() - this.getColumna();
         
-        if (estaClavada) { 
-        //Si esta clavada no se puede mover 
+        // Comprobamos que el movimiento es diagonal
+        if (Math.abs(diferenciaCol) != Math.abs(diferenciaFil)) {
             return false;
-        }else if (!(nuevaPosicion.esValida())) { 
-        // Esta fuera del tablero
-            return false;
-        }else if (Math.abs(diferenciaCol) != Math.abs(diferenciaFil)) { 
-        // No esta en diagonal
-            return false;
-        }else if (this.posicion.equals(nuevaPosicion)) { 
-        // Es la misma poscion
-            return false;
-        }else if (tablero[nuevaPosicion.getFila()][nuevaPosicion.getColumna()] != null) {
-        // La posicion a la que quiere moverse esta ocupada
-            if (tablero[nuevaPosicion.getFila()][nuevaPosicion.getColumna()].equalsColor(color)) {
-            // La pieza que ocupa la posicion es del mismo color
-                return false;
-            }
         }
         
         // Si llega aqui, en princio el movimiento es valido a no ser que haya 
@@ -102,8 +90,15 @@ public class Alfil extends Pieza{
                 return false;
             }
         }
-        // Si llega aqui el movimiento es valido
-        return true;
+        
+        // Comprobamos la casilla final
+        if (tablero[nuevaPosicion.getFila()][nuevaPosicion.getColumna()] == null) {
+            return true;
+        } else if (!tablero[nuevaPosicion.getFila()][nuevaPosicion.getColumna()].equalsColor(color)) {
+            return true;
+        }
+        
+        return false;
     }
     
     @Override

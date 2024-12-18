@@ -1,7 +1,7 @@
 package daw;
 
 import Piezas.*;
-import javax.swing.JOptionPane;
+
 
 public class Ajedrez {
 
