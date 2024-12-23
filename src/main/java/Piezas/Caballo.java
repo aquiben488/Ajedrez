@@ -4,6 +4,11 @@ import daw.Utiles;
 
 public class Caballo extends Pieza {
 
+    @Override
+    public String getNombre() {
+        return "Caballo";
+    }   
+
     public static void main(String[] args) throws Exception {
         Pieza[][] tablero = new Pieza[8][8];
         
@@ -68,7 +73,7 @@ public class Caballo extends Pieza {
     @Override
     public boolean esMovimientoValido(Pieza[][] tablero, Posicion nuevaPosicion) {
         
-        if (!movimientoFactible(nuevaPosicion)) {
+        if (!movimientoFactible(tablero, nuevaPosicion)) {
             return false;
         }
         

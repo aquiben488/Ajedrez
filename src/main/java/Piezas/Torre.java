@@ -2,8 +2,12 @@ package Piezas;
 
 import daw.Utiles;
 
-public class Torre extends Pieza {
-    
+public class Torre extends Pieza {  
+
+    @Override
+    public String getNombre() {
+        return "Torre";
+    }   
     
     public static void main(String[] args) throws Exception {
         Pieza[][] tablero = new Pieza[8][8];
@@ -74,7 +78,7 @@ public class Torre extends Pieza {
     @Override
     public boolean esMovimientoValido(Pieza[][] tablero, Posicion nuevaPosicion) {
         
-        if (!movimientoFactible(nuevaPosicion)) {
+        if (!movimientoFactible(tablero, nuevaPosicion)) {
             return false;
         }
         

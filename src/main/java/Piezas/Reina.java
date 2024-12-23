@@ -3,7 +3,12 @@ package Piezas;
 import daw.Utiles;
 
 public class Reina extends Pieza {
-    
+
+    @Override
+    public String getNombre() {
+        return "Reina";
+    }      
+
 public static void main(String[] args) throws Exception {
         Pieza[][] tablero = new Pieza[8][8];
         
@@ -81,7 +86,7 @@ public static void main(String[] args) throws Exception {
     @Override
     public boolean esMovimientoValido(Pieza[][] tablero, Posicion nuevaPosicion) {
 
-        if (!movimientoFactible(nuevaPosicion)) {
+        if (!movimientoFactible(tablero, nuevaPosicion)) {
             return false;
         }
 

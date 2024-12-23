@@ -70,5 +70,23 @@ public class Posicion {
         return filaNotacion + "" + columnaNotacion;
     }
     
+    public static Posicion  parsePosicion(String notacion) {
+        // Validamos que el string tenga el formato correcto (número + letra)
+        if (notacion.length() != 2 || !Character.isDigit(notacion.charAt(0)) || !Character.isLetter(notacion.charAt(1))) {
+            throw new IllegalArgumentException("Formato de notación inválido");
+        }
+        
+        // Extraemos fila y columna del string
+        int fila = Character.getNumericValue(notacion.charAt(0)) - 1; // 1 -> 0, 8 -> 7
+        int columna = notacion.charAt(1) - 'a'; // 'a' -> 0, 'h' -> 7
+        
+        // Validamos que los valores estén dentro del rango
+        if (fila < 0 || fila > 7 || columna < 0 || columna > 7) {
+            throw new IllegalArgumentException("Posición fuera del tablero");
+        }
+        
+        return new Posicion(fila, columna);
+    }
+    
 
 }

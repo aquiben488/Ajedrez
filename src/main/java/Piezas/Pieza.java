@@ -1,11 +1,79 @@
- 
 package Piezas;
+
+import daw.Utiles;
 
 // Pieza es una clase abtracta que sirve como plantilla para las demas piezas
 public abstract class Pieza {
+
+    public static void main(String[] args) throws Exception {
+        /*
+        Pieza[][] tablero = new Pieza[8][8];
+        
+        // Colocamos un rey blanco
+        tablero[4][4] = new Rey(true, 4, 4);
+        
+        // Colocamos una torre blanca que protege al rey
+        tablero[4][3] = new Torre(true, 4, 3);
+        
+        // Colocamos una torre negra que amenaza al rey si se mueve la torre blanca
+        tablero[4][0] = new Torre(false, 4, 0);
+        
+        // Probamos movimientos de la torre clavada
+        Posicion pos1 = new Posicion(3, 3); // Intento de comer pieza - debería ser inválido por estar clavada
+        Posicion pos2 = new Posicion(5, 3); // Intento de mover verticalmente - debería ser inválido por estar clavada
+        Posicion pos3 = new Posicion(4, 2); // Intento de mover horizontalmente en línea con el rey - debería ser válido
+        Posicion pos4 = new Posicion(4, 1); // Intento de mover horizontalmente en línea con el rey - debería ser válido
+        
+        System.out.println("\nPruebas de movimientos de torre clavada:");
+        System.out.println("Mover a (3,3): " + tablero[4][3].esMovimientoValido(tablero, pos1) + " (debería ser false - torre clavada)");
+        System.out.println("Mover a (5,3): " + tablero[4][3].esMovimientoValido(tablero, pos2) + " (debería ser false - torre clavada)");
+        System.out.println("Mover a (4,2): " + tablero[4][3].esMovimientoValido(tablero, pos3) + " (debería ser true - movimiento en línea con el rey)");
+        System.out.println("Mover a (4,1): " + tablero[4][3].esMovimientoValido(tablero, pos4) + " (debería ser true - movimiento en línea con el rey)");
+        */
+        
+        Pieza[][] tablero = new Pieza[8][8];
+        
+        // Colocamos un rey blanco y una torre negra que lo pone en jaque
+        Rey reyBlanco = new Rey(true, 4, 4);
+        tablero[4][4] = reyBlanco;
+        tablero[4][7] = new Torre(false, 4, 7);
+        
+        // Colocamos una torre blanca que puede interponerse
+        tablero[2][4] = new Torre(true, 2, 4);
+        
+        // Colocamos un peón blanco que no puede ayudar al rey
+        tablero[3][3] = new Peon(true, 3, 3);
+        
+        Utiles.toString(tablero);
+        
+        // Probamos movimientos del rey en jaque
+        Posicion pos1 = new Posicion(3, 4); // Movimiento válido - el rey escapa del jaque
+        Posicion pos2 = new Posicion(4, 5); // Movimiento válido - el rey escapa del jaque
+        Posicion pos3 = new Posicion(4, 3); // Movimiento válido - el rey escapa del jaque
+        Posicion pos4 = new Posicion(5, 5); // Movimiento válido - el rey escapa del jaque
+        Posicion pos5 = new Posicion(5, 4); // Movimiento inválido - el rey sigue en jaque
+        
+        System.out.println("\nPruebas de movimientos del rey en jaque:");
+        System.out.println("Rey a (3,4): " + reyBlanco.esMovimientoValido(tablero, pos1) + " (debería ser true - escapa del jaque)");
+        System.out.println("Rey a (4,5): " + reyBlanco.esMovimientoValido(tablero, pos2) + " (debería ser true - escapa del jaque)");
+        System.out.println("Rey a (4,3): " + reyBlanco.esMovimientoValido(tablero, pos3) + " (debería ser true - escapa del jaque)");
+        System.out.println("Rey a (5,5): " + reyBlanco.esMovimientoValido(tablero, pos4) + " (debería ser true - escapa del jaque)");
+        System.out.println("Rey a (5,4): " + reyBlanco.esMovimientoValido(tablero, pos5) + " (debería ser false - sigue en jaque)");
+        
+        // Probamos movimientos de otras piezas con el rey en jaque
+        Posicion pos6 = new Posicion(4, 6); // Movimiento válido - la torre se interpone
+        Posicion pos7 = new Posicion(2, 5); // Movimiento inválido - no ayuda al rey
+        Posicion pos8 = new Posicion(3, 4); // Movimiento inválido - no ayuda al rey
+        
+        System.out.println("\nPruebas de movimientos de otras piezas con rey en jaque:");
+        System.out.println("Torre a (4,6): " + tablero[2][4].esMovimientoValido(tablero, pos6) + " (debería ser true - se interpone)");
+        System.out.println("Torre a (2,5): " + tablero[2][4].esMovimientoValido(tablero, pos7) + " (debería ser false - no ayuda al rey)");
+        System.out.println("Peón a (3,4): " + tablero[3][3].esMovimientoValido(tablero, pos8) + " (debería ser false - no ayuda al rey)");
+
+    }
     
     
-    protected final boolean estamosEnLinux = true;
+    protected final boolean estamosEnLinux = false;
     
     // Protected ya que van a ser usadas por las otras piezas
     protected final boolean color;
@@ -17,10 +85,10 @@ public abstract class Pieza {
     // se volvera false tras el primer movimiento
     protected boolean noSeHaMovido = true;
     
-    // Este boolean es necesario ya que se una pieza esta clavada
-    // No puede moverse
-    protected boolean estaClavada = false;
-
+    // Flag para evitar la recursión infinita en la comprobación de piezas clavadas (deja al rey en jaque)
+    private boolean verificandoJaque = false;
+    
+    public abstract String getNombre();
     
     public Pieza(boolean color, int fila, int columna){
         this.color = color;
@@ -35,9 +103,14 @@ public abstract class Pieza {
     public abstract boolean esMovimientoValido(Pieza[][] tablero,Posicion nuevaPosicion);
     
     // Este sera el metodo que usaran todas las piezas
+
     // Esto llama a posicion.toString, que devuleve la posicon en notacion de ajedrez
     public Posicion getPosicion() {
         return posicion;
+    }
+
+    public boolean getNoSeHaMovido() {
+        return noSeHaMovido;
     }
     
     // Devuelve el getFila de Posicion
@@ -54,10 +127,6 @@ public abstract class Pieza {
         return color == this.color;
     }
 
-    public boolean getEstaClavada() {
-        return estaClavada;
-    }
-
     public void setPosicion(Posicion posicion) {
         this.posicion = posicion;
     }
@@ -67,14 +136,15 @@ public abstract class Pieza {
         this.posicion.setColumna(columna);
     }
     
-    public void setEstaClavada(boolean estaClavada) {
-        this.estaClavada = estaClavada;
-    }
-    
     @Override
     public abstract String toString();  
     
-    protected boolean movimientoFactible(Posicion nuevaPosicion) {
+    protected boolean movimientoFactible(Pieza[][] tablero, Posicion nuevaPosicion) {
+        // Verificar null primero
+        if (nuevaPosicion == null) {
+            return false;
+        }
+
         if (!(nuevaPosicion.esValida())) {
             // Esta fuera del tablero
             return false;
@@ -82,9 +152,83 @@ public abstract class Pieza {
             // La posicion es la misma
             return false;
         }
+
+        // Si ya estamos verificando jaque, evitamos la recursión
+        if (verificandoJaque) {
+            return true;
+        }
+
+        try {
+            verificandoJaque = true;
+            if (dejaAlReyEnJaque(tablero, nuevaPosicion)) {
+                return false;
+            }
+        } finally {
+            verificandoJaque = false;
+        }
+        
         return true;
     }
     
-}
+    public void mover(Pieza[][] tablero, Posicion nuevaPosicion) {
 
+        if (this.esMovimientoValido(tablero, nuevaPosicion)) {
+            // Eliminamos la pieza de su posicion actual    
+            tablero[this.getFila()][this.getColumna()] = null;
+            // Movemos la pieza a la nueva posicion
+            this.posicion = nuevaPosicion;
+            // Indicamos que la pieza ya no es la primera vez que se mueve
+            this.noSeHaMovido = false;
+            // Movemos la pieza a la nueva posicion
+            tablero[this.getFila()][this.getColumna()] = this;
+        }
+        else {
+            throw new IllegalArgumentException("Movimiento no valido");
+        }   
+
+    }
+
+    public boolean dejaAlReyEnJaque(Pieza[][] tablero, Posicion nuevaPosicion) {
+
+        // Si el movimiento deja al rey en jaque, devuelve true
+
+        // Para ello, creamos un tablero auxiliar con la nueva posicion de la pieza
+        // (ademas buscaremos el rey ya que necesitamos su posicion)
+
+        // En este caso estamos haciendo un alias de cada pieza, no copiamos la pieza, 
+        // solo copiamos la referencia a la pieza, por lo que si modificamos el tableroTrasMovimiento,
+        // modificamos el tablero original
+        Posicion reyPosicion = null;
+        Pieza[][] tableroTrasMovimiento = new Pieza[8][8];
+        for (int i = 0; i < tablero.length; i++) {
+            for (int j = 0; j < tablero[i].length; j++) {
+                tableroTrasMovimiento[i][j] = tablero[i][j];
+                if (tablero[i][j] instanceof Rey && tablero[i][j].equalsColor(this.color)) {
+                    reyPosicion = new Posicion(i, j);
+                }
+            }
+        }
+        tableroTrasMovimiento[nuevaPosicion.getFila()][nuevaPosicion.getColumna()] = this;
+        tableroTrasMovimiento[this.getFila()][this.getColumna()] = null;
+
+        // Si la pieza que se mueve es el rey, actualizar su posición
+        if (this instanceof Rey) {
+            reyPosicion = nuevaPosicion;
+        }
+
+        for (Pieza[] fila : tableroTrasMovimiento) {
+            for (Pieza pieza : fila) {
+                // Comprobamos que no sea null y que no sea de nuestro color y que no sea un rey (lo comprobamos antes)
+                if (pieza != null && !(pieza.equalsColor(color)) && !(pieza instanceof Rey)) {
+                    // Comprobamos que la pieza pueda comer al peon de prueba
+                    if (pieza.esMovimientoValido(tableroTrasMovimiento, reyPosicion)) {
+                        return true;
+                    }  
+                }
+            }
+        }
+        return false;
+    }
+    
+}
 

@@ -3,21 +3,48 @@ package Piezas;
 import daw.Utiles;
 
 public class Peon extends Pieza {
-    
+
+    @Override
+    public String getNombre() {
+        return "Peon";
+    }      
+
     public static void main(String[] args) throws Exception {
-        
         Pieza[][] tablero = new Pieza[8][8];
         
-        tablero[2][2] = new Peon(true,2,2);
-        tablero[3][2] = new Peon(true,3,2);
-        tablero[3][3] = new Peon(false,3,3);
+        // Colocamos un peón negro en el centro
+        tablero[4][4] = new Peon(false, 4, 4);
         
-         Utiles.toString(tablero);
-         
-         Posicion pos = new Posicion(5,2);
-         
-         System.out.println(tablero[2][2].esMovimientoValido(tablero, pos));
+        // Piezas que puede comer (blancas en diagonal)
+        tablero[3][5] = new Peon(true, 3, 5);
+        tablero[3][3] = new Peon(true, 3, 3);
         
+        // Piezas que bloquean movimiento
+        tablero[3][4] = new Peon(true, 3, 4); // Bloquea avance
+        tablero[2][4] = new Peon(false, 2, 4); // Pieza propia
+        
+        Utiles.toString(tablero);
+        
+        // Probamos movimientos
+        // Movimientos válidos
+        Posicion pos1 = new Posicion(3, 5); // Comer en diagonal derecha
+        Posicion pos2 = new Posicion(3, 3); // Comer en diagonal izquierda
+        
+        // Movimientos inválidos
+        Posicion pos3 = new Posicion(3, 4); // Avanzar con pieza delante
+        Posicion pos4 = new Posicion(2, 4); // Mover a casilla con pieza propia
+        Posicion pos5 = new Posicion(1, 4); // Avanzar más de 2 casillas
+        Posicion pos6 = new Posicion(5, 4); // Retroceder
+        
+        System.out.println("\nPruebas de movimientos válidos:");
+        System.out.println("Comer en diagonal derecha: " + tablero[4][4].esMovimientoValido(tablero, pos1));
+        System.out.println("Comer en diagonal izquierda: " + tablero[4][4].esMovimientoValido(tablero, pos2));
+        
+        System.out.println("\nPruebas de movimientos inválidos:");
+        System.out.println("Avanzar con pieza delante: " + tablero[4][4].esMovimientoValido(tablero, pos3));
+        System.out.println("Mover a casilla con pieza propia: " + tablero[4][4].esMovimientoValido(tablero, pos4));
+        System.out.println("Avanzar más de 2 casillas: " + tablero[4][4].esMovimientoValido(tablero, pos5));
+        System.out.println("Retroceder: " + tablero[4][4].esMovimientoValido(tablero, pos6));
     }
 
     public Peon(boolean color, int fila, int columna) {
@@ -32,7 +59,7 @@ public class Peon extends Pieza {
     @Override
     public boolean esMovimientoValido(Pieza[][] tablero, Posicion nuevaPosicion) {
 
-        if (!movimientoFactible(nuevaPosicion)) {
+        if (!movimientoFactible(tablero, nuevaPosicion)) {
             return false;
         }
         
@@ -105,9 +132,9 @@ public class Peon extends Pieza {
             }
         } else {
             if (color) {
-                return "\u2659";
+                return "Pw";
             } else {
-                return "\u265F";
+                return "Pb";
             }
         }
 

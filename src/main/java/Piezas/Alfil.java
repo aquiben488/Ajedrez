@@ -4,6 +4,11 @@ import daw.Utiles;
 
 public class Alfil extends Pieza{
 
+    @Override
+    public String getNombre() {
+        return "Alfil";
+    }   
+
     public static void main(String[] args) throws Exception {
         Pieza[][] tablero = new Pieza[8][8];
         
@@ -47,13 +52,13 @@ public class Alfil extends Pieza{
     }
     
     // Para comprobar si el movimiento de un alfil es valido:
-    // - Esta dento del tablero
+    // - Esta dentro del tablero
     // - La distancia de filas y de columnas es la misma (esta en diagonal) 
     // - No hay piezas en medio
     
     @Override
     public boolean esMovimientoValido(Pieza[][] tablero, Posicion nuevaPosicion) {
-        if (!movimientoFactible(nuevaPosicion)) {
+        if (!movimientoFactible(tablero, nuevaPosicion)) {
             return false;
         }
         
