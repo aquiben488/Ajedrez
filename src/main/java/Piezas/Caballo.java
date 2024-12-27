@@ -51,13 +51,13 @@ public class Caballo extends Pieza {
     public String toString() {
 
         if (estamosEnLinux) {
-            if (color) {
+            if (this.COLOR) {
                 return "\u2658 ";
             } else {
                 return "\u265E ";
             }
         } else {
-            if (color) {
+            if (this.COLOR) {
                 return "Nw";
             } else {
                 return "Nb";
@@ -98,7 +98,7 @@ public class Caballo extends Pieza {
             return false;  
         }else if (tablero[nuevaFila][nuevaColumna] == null) {
             return true;
-        }else if (!(tablero[nuevaFila][nuevaColumna].equalsColor(color))) {
+        }else if (!(tablero[nuevaFila][nuevaColumna].equalsColor(this.COLOR))) {
             return true;
         }else{
             return false;

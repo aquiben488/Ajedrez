@@ -10,21 +10,24 @@ public class Rey extends Pieza {
     }   
 
     public static void main(String[] args) throws Exception {
+
         /*
+
+        // Pruebas basicas de rey
         Pieza[][] tablero = new Pieza[8][8];
         
         // Colocamos un rey blanco en el centro
-        tablero[4][4] = new Rey(true, 4, 4);
+        tablero[4][4] = new Rey(false, 4, 4);
         
         // Piezas que puede comer (negras sin protección)
-        tablero[4][5] = new Peon(false, 4, 5); // Horizontal
+        tablero[4][5] = new Peon(true, 4, 5); // Horizontal
         
         // Pieza negra protegida por peón
-        tablero[3][3] = new Alfil(false, 3, 3);
-        tablero[2][2] = new Peon(false, 2, 2); // Protege al alfil
+        tablero[3][3] = new Alfil(true, 3, 3);
+        tablero[2][2] = new Peon(true, 2, 2); // Protege al alfil
         
         // Piezas del mismo color (blancas)
-        tablero[5][4] = new Peon(true, 5, 4);
+        tablero[5][4] = new Peon(false, 5, 4);
         
         Utiles.toString(tablero);
         
@@ -49,9 +52,8 @@ public class Rey extends Pieza {
         System.out.println("Movimiento a (6,6): " + tablero[4][4].esMovimientoValido(tablero, pos5) + " (debería ser false - fuera de alcance)");
         System.out.println("Movimiento a (8,8): " + tablero[4][4].esMovimientoValido(tablero, pos6) + " (debería ser false - fuera del tablero)");
         */
-        
-        // Prueba de interacción entre reyes
-        /* Pruebas de reyes enfrentados
+
+        // Pruebas de reyes enfrentados
         Pieza[][] tablero = new Pieza[8][8];
         
         // Colocamos los reyes en posiciones cercanas
@@ -79,8 +81,10 @@ public class Rey extends Pieza {
         Posicion pos3 = new Posicion(4, 5);
         System.out.println("Movimiento del rey negro a (4,5): " + reyNegro.esMovimientoValido(tablero, pos3) + 
                          " (debería ser false - demasiado cerca del rey blanco)");
-        */
         
+        
+        /*
+
         // Pruebas de enroque
         Pieza[][] tablero = new Pieza[8][8];
         
@@ -129,6 +133,7 @@ public class Rey extends Pieza {
                          " (debería ser true - última casilla atacada (como el rey no pasa por ahi solo importa que no este ocupada))");
 
         Utiles.toString(tablero);
+        */
     }
 
     public Rey(boolean color, int fila, int columna) {
@@ -139,19 +144,18 @@ public class Rey extends Pieza {
     public String toString() {
 
         if (estamosEnLinux) {
-            if (color) {
+            if (this.COLOR) {
                 return "\u2654 ";
             } else {
                 return "\u265A ";
             }
         } else {
-            if (color) {
+            if (this.COLOR) {
                 return "Kw";
             } else {
                 return "Kb";
             }
         }
-
     }
 
     @Override
@@ -162,6 +166,7 @@ public class Rey extends Pieza {
         // y que no este ocupada por una pieza del mismo color
         // y que no haya ninguna pieza del otro color que pueda comer al rey
 
+        // Comprobamos que el movimiento sea factible (incluido que el rey se ponga en jaque)
         if (!movimientoFactible(tablero, nuevaPosicion)) {
             return false;
         }
@@ -171,14 +176,13 @@ public class Rey extends Pieza {
             return false;
         }
 
-        // Si hay enroque, devolvemos true  (comprobamos todo lo necesario en el metodo)
+        // Si hay enroque, devolvemos true (comprobamos todo lo necesario en el metodo)
         if (hayEnroque(tablero, nuevaPosicion)) {
             return true;
         }
 
         // Si no hay enroque, comprobamos que la nueva posicion este a una casilla de distancia
         // y que no este ocupada por una pieza del mismo color
-        // y que no haya ninguna pieza del otro color que pueda comer al rey
         int diferenciaFil = nuevaPosicion.getFila() - this.getFila();
         int diferenciaCol = nuevaPosicion.getColumna() - this.getColumna();
 
@@ -195,33 +199,10 @@ public class Rey extends Pieza {
 
         // Comprobamos que la nueva posicion no este ocupada por una pieza del mismo color
         if (tablero[nuevaFila][nuevaColumna] != null) {
-            if (tablero[nuevaFila][nuevaColumna].equalsColor(color)) {
+            if (tablero[nuevaFila][nuevaColumna].equalsColor(this.COLOR)) {
                 return false;
             }
         }
-
-        Pieza[][] tableroTrasMovimiento = new Pieza[8][8];
-        for (int i = 0; i < tablero.length; i++) {
-            for (int j = 0; j < tablero[i].length; j++) {
-                tableroTrasMovimiento[i][j] = tablero[i][j];
-            }
-        }
-        tableroTrasMovimiento[nuevaFila][nuevaColumna] = new Rey(this.color, nuevaFila, nuevaColumna);
-
-        // Comprobamos que no haya ninguna pieza del otro color que pueda comer al peon de prueba del nuevo tablero
-        for (Pieza[] fila : tablero) {
-            for (Pieza pieza : fila) {
-                // Comprobamos que no sea null y que no sea de nuestro color y que no sea un rey (lo comprobamos antes)
-                if (pieza != null && !(pieza.equalsColor(color)) && !(pieza instanceof Rey)) {
-                    // Comprobamos que la pieza pueda comer al peon de prueba
-                    if (pieza.esMovimientoValido(tableroTrasMovimiento, nuevaPosicion)) {
-                        return false;
-                    }  
-                }
-            }
-        }
-        // Esto es necesario ya que sin una pieza del color contrario en la poscion del nuevo movimiento 
-        // no podemos comprobar si el rey se pone en jaque
 
         return true;
     }
@@ -235,7 +216,7 @@ public class Rey extends Pieza {
         // Buscamos el rey del otro color
         for (Pieza[] fila : tablero) {
             for (Pieza pieza : fila) {
-                if (pieza instanceof Rey && pieza.equalsColor(!color)) {
+                if (pieza instanceof Rey && pieza.equalsColor(!this.COLOR)) {
                     reyOtroColor = pieza;
                     break;
                 }
@@ -265,8 +246,19 @@ public class Rey extends Pieza {
 
         // Para que haya enroque, el rey no se debe haber movido ya
         // ademas la torre tampoco se debe haber movido
-        // no debe haber jaque (no esta implementado)
+        // no debe haber jaque
         // ademas las casillas entre el rey y la torre deben estar libres y no estar atacadas por ninguna pieza del otro color
+
+        // Comprobamos que no haya jaque
+        for (Pieza[] fila : tablero) {
+            for (Pieza pieza : fila) {
+                if (pieza != null && !(pieza.equalsColor(this.COLOR)) && !(pieza instanceof Rey)) {
+                    if (pieza.esMovimientoValido(tablero, this.getPosicion())) {
+                        return false;
+                    }
+                }
+            }
+        }
 
         int diferenciaColumna = nuevaPosicion.getColumna() - this.getColumna();
         int signoDiferenciaColumna = (int)Math.signum(diferenciaColumna);
@@ -317,7 +309,7 @@ public class Rey extends Pieza {
         
         for (Pieza[] fila : tablero) {
             for (Pieza pieza : fila) {
-                if (pieza != null && !(pieza.equalsColor(color)) && !(pieza instanceof Rey)) {
+                if (pieza != null && !(pieza.equalsColor(this.COLOR)) && !(pieza instanceof Rey)) {
                     if (pieza.esMovimientoValido(tablero, posicion1diferencia) || pieza.esMovimientoValido(tablero, posicion2diferencia)) {
                         return false;
                     }  

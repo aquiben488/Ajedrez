@@ -34,49 +34,43 @@ public abstract class Pieza {
         Pieza[][] tablero = new Pieza[8][8];
         
         // Colocamos un rey blanco y una torre negra que lo pone en jaque
-        Rey reyBlanco = new Rey(true, 4, 4);
-        tablero[4][4] = reyBlanco;
+
+        tablero[4][4] = new Rey(true, 4, 4);
         tablero[4][7] = new Torre(false, 4, 7);
         
         // Colocamos una torre blanca que puede interponerse
-        tablero[2][4] = new Torre(true, 2, 4);
-        
-        // Colocamos un peón blanco que no puede ayudar al rey
-        tablero[3][3] = new Peon(true, 3, 3);
+        tablero[2][5] = new Torre(true, 2, 5);
         
         Utiles.toString(tablero);
         
         // Probamos movimientos del rey en jaque
         Posicion pos1 = new Posicion(3, 4); // Movimiento válido - el rey escapa del jaque
-        Posicion pos2 = new Posicion(4, 5); // Movimiento válido - el rey escapa del jaque
-        Posicion pos3 = new Posicion(4, 3); // Movimiento válido - el rey escapa del jaque
+        Posicion pos2 = new Posicion(4, 5); // Movimiento inválido - el rey sigue en jaque
+        Posicion pos3 = new Posicion(4, 3); // Movimiento inválido - el rey sigue en jaque
         Posicion pos4 = new Posicion(5, 5); // Movimiento válido - el rey escapa del jaque
-        Posicion pos5 = new Posicion(5, 4); // Movimiento inválido - el rey sigue en jaque
+        Posicion pos5 = new Posicion(5, 4); // Movimiento válido - el rey escapa del jaque
         
         System.out.println("\nPruebas de movimientos del rey en jaque:");
-        System.out.println("Rey a (3,4): " + reyBlanco.esMovimientoValido(tablero, pos1) + " (debería ser true - escapa del jaque)");
-        System.out.println("Rey a (4,5): " + reyBlanco.esMovimientoValido(tablero, pos2) + " (debería ser true - escapa del jaque)");
-        System.out.println("Rey a (4,3): " + reyBlanco.esMovimientoValido(tablero, pos3) + " (debería ser true - escapa del jaque)");
-        System.out.println("Rey a (5,5): " + reyBlanco.esMovimientoValido(tablero, pos4) + " (debería ser true - escapa del jaque)");
-        System.out.println("Rey a (5,4): " + reyBlanco.esMovimientoValido(tablero, pos5) + " (debería ser false - sigue en jaque)");
+        System.out.println("Rey a (3,4): " + tablero[4][4].esMovimientoValido(tablero, pos1) + " (debería ser true - escapa del jaque)");
+        System.out.println("Rey a (4,5): " + tablero[4][4].esMovimientoValido(tablero, pos2) + " (debería ser false - sigue en jaque)");
+        System.out.println("Rey a (4,3): " + tablero[4][4].esMovimientoValido(tablero, pos3) + " (debería ser false - sigue en jaque)");
+        System.out.println("Rey a (5,5): " + tablero[4][4].esMovimientoValido(tablero, pos4) + " (debería ser true - escapa del jaque)");
+        System.out.println("Rey a (5,4): " + tablero[4][4].esMovimientoValido(tablero, pos5) + " (debería ser true - escapa del jaque)");
         
         // Probamos movimientos de otras piezas con el rey en jaque
-        Posicion pos6 = new Posicion(4, 6); // Movimiento válido - la torre se interpone
+        Posicion pos6 = new Posicion(4, 5); // Movimiento válido - la torre se interpone
         Posicion pos7 = new Posicion(2, 5); // Movimiento inválido - no ayuda al rey
-        Posicion pos8 = new Posicion(3, 4); // Movimiento inválido - no ayuda al rey
         
         System.out.println("\nPruebas de movimientos de otras piezas con rey en jaque:");
-        System.out.println("Torre a (4,6): " + tablero[2][4].esMovimientoValido(tablero, pos6) + " (debería ser true - se interpone)");
-        System.out.println("Torre a (2,5): " + tablero[2][4].esMovimientoValido(tablero, pos7) + " (debería ser false - no ayuda al rey)");
-        System.out.println("Peón a (3,4): " + tablero[3][3].esMovimientoValido(tablero, pos8) + " (debería ser false - no ayuda al rey)");
-
+        System.out.println("Torre a (4,5): " + tablero[2][5].esMovimientoValido(tablero, pos6) + " (debería ser true - se interpone)");
+        System.out.println("Torre a (2,5): " + tablero[2][5].esMovimientoValido(tablero, pos7) + " (debería ser false - no ayuda al rey)");
     }
     
     
     protected final boolean estamosEnLinux = false;
     
     // Protected ya que van a ser usadas por las otras piezas
-    protected final boolean color;
+    protected final boolean COLOR;
     protected Posicion posicion;
     
     // Este boolean es necesario ya que hay movimientos como 
@@ -90,8 +84,8 @@ public abstract class Pieza {
     
     public abstract String getNombre();
     
-    public Pieza(boolean color, int fila, int columna){
-        this.color = color;
+    public Pieza(boolean COLOR, int fila, int columna){
+        this.COLOR = COLOR;
         this.posicion = new Posicion(fila, columna);
     }
     
@@ -124,7 +118,7 @@ public abstract class Pieza {
     }
     
     public boolean equalsColor(boolean color) {
-        return color == this.color;
+        return color == this.COLOR;
     }
 
     public void setPosicion(Posicion posicion) {
@@ -188,9 +182,12 @@ public abstract class Pieza {
 
     }
 
-    public boolean dejaAlReyEnJaque(Pieza[][] tablero, Posicion nuevaPosicion) {
+    protected boolean dejaAlReyEnJaque(Pieza[][] tablero, Posicion nuevaPosicion) {
 
         // Si el movimiento deja al rey en jaque, devuelve true
+         
+        // Basicamente, con esto tenemos que si hay jaque solo se puede mover una pieza que interponga o se mueva a una posicion que no deje al rey en jaque
+        // y que no se puedan mover piezas clavadas
 
         // Para ello, creamos un tablero auxiliar con la nueva posicion de la pieza
         // (ademas buscaremos el rey ya que necesitamos su posicion)
@@ -198,12 +195,13 @@ public abstract class Pieza {
         // En este caso estamos haciendo un alias de cada pieza, no copiamos la pieza, 
         // solo copiamos la referencia a la pieza, por lo que si modificamos el tableroTrasMovimiento,
         // modificamos el tablero original
+
         Posicion reyPosicion = null;
         Pieza[][] tableroTrasMovimiento = new Pieza[8][8];
         for (int i = 0; i < tablero.length; i++) {
             for (int j = 0; j < tablero[i].length; j++) {
                 tableroTrasMovimiento[i][j] = tablero[i][j];
-                if (tablero[i][j] instanceof Rey && tablero[i][j].equalsColor(this.color)) {
+                if (tablero[i][j] instanceof Rey && tablero[i][j].equalsColor(this.COLOR)) {
                     reyPosicion = new Posicion(i, j);
                 }
             }
@@ -219,8 +217,8 @@ public abstract class Pieza {
         for (Pieza[] fila : tableroTrasMovimiento) {
             for (Pieza pieza : fila) {
                 // Comprobamos que no sea null y que no sea de nuestro color y que no sea un rey (lo comprobamos antes)
-                if (pieza != null && !(pieza.equalsColor(color)) && !(pieza instanceof Rey)) {
-                    // Comprobamos que la pieza pueda comer al peon de prueba
+                if (pieza != null && !(pieza.equalsColor(this.COLOR)) && !(pieza instanceof Rey)) {
+                    // Comprobamos que la pieza pueda comer al rey
                     if (pieza.esMovimientoValido(tableroTrasMovimiento, reyPosicion)) {
                         return true;
                     }  

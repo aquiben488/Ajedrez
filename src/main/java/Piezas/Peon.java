@@ -68,7 +68,7 @@ public class Peon extends Pieza {
         // en la que ya esta la propia pieza
         // ahora debemos comprobar que el movimiento es posible por la propia pieza
         // Si es blanca suma en filas, si es negra resta
-        int signoMovimiento = (this.color) ? (1) : (-1);
+        int signoMovimiento = (this.COLOR) ? (1) : (-1);
         int diferenciaFilas = nuevaPosicion.getFila() - this.getFila();
         int diferenciaColumnas = nuevaPosicion.getColumna() - this.getColumna();
         int filaAComprobar;
@@ -110,7 +110,7 @@ public class Peon extends Pieza {
             if (tablero[nuevaPosicion.getFila()][nuevaPosicion.getColumna()] == null) {
                 // La casilla esta vacia
                 return false;
-            }else if (!(tablero[nuevaPosicion.getFila()][nuevaPosicion.getColumna()].equalsColor(color))) {
+            }else if (!(tablero[nuevaPosicion.getFila()][nuevaPosicion.getColumna()].equalsColor(this.COLOR))) {
                 // La casilla esta ocupada por una pieza de disatinto color
                 return true;
             }else{
@@ -125,13 +125,13 @@ public class Peon extends Pieza {
     public String toString() {
 
         if (estamosEnLinux) {
-            if (color) {
+            if (this.COLOR) {
                 return "\u2659 ";
             } else {
                 return "\u265F ";
             }
         } else {
-            if (color) {
+            if (this.COLOR) {
                 return "Pw";
             } else {
                 return "Pb";

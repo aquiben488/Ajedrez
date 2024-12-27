@@ -99,7 +99,7 @@ public class Alfil extends Pieza{
         // Comprobamos la casilla final
         if (tablero[nuevaPosicion.getFila()][nuevaPosicion.getColumna()] == null) {
             return true;
-        } else if (!tablero[nuevaPosicion.getFila()][nuevaPosicion.getColumna()].equalsColor(color)) {
+        } else if (!tablero[nuevaPosicion.getFila()][nuevaPosicion.getColumna()].equalsColor(this.COLOR)) {
             return true;
         }
         
@@ -110,13 +110,13 @@ public class Alfil extends Pieza{
     public String toString() {
         
             if (estamosEnLinux) {
-                if (color) {
+                if (this.COLOR) {
                     return "\u2657 ";
                 } else {
                     return "\u265D ";
                 }
             } else {
-                if (color) {
+                if (this.COLOR) {
                     return "Bw";
                 } else {
                     return "Bb";

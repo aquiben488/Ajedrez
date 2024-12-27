@@ -12,7 +12,7 @@ public class Utiles {
     // que este en la posicon, si no pinta la casilla vacia(blanca o negra)
     // tambien añade las coordenadas (1-8 y a-h)
      // Metodo original que muestra coordenadas de ajedrez (1-8, a-h)
-     public static void toString(Pieza[][] tablero) throws Exception {
+     /*public static void toString(Pieza[][] tablero) throws Exception {
         StringBuilder sb = new StringBuilder();
         int notLat = 8;
 
@@ -36,32 +36,32 @@ public class Utiles {
         }
         sb.append("\na b c d e f g h");
          soutUTF8(sb.toString());
-    }
+    }*/
 
      // Version que muestra coordenadas de la matriz
-//     public static void toString(Pieza[][] tablero) throws Exception {
-//        StringBuilder sb = new StringBuilder();
-//
-//        for (int i = 0; i < tablero.length; i++) {
-//            for (int j = 0; j < tablero[i].length; j++) {
-//
-//                if (tablero[i][j] != null) {
-//                    sb.append(tablero[i][j]);
-//                } else {
-//                    if (celdaEsBlanca(i, j)) {
-//                        sb.append("X ");
-//                    } else {
-//                        sb.append("O ");
-//                    }
-//
-//                }
-//            }
-//            sb.append("  " + i);
-//            sb.append("\n");
-//        }
-//        sb.append("\n0 1 2 3 4 5 6 7");
-//         soutUTF8(sb.toString());
-//    }
+     public static void toString(Pieza[][] tablero) throws Exception {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < tablero.length; i++) {
+            for (int j = 0; j < tablero[i].length; j++) {
+
+                if (tablero[i][j] != null) {
+                    sb.append(tablero[i][j]);
+                } else {
+                    if (celdaEsBlanca(i, j)) {
+                        sb.append("X ");
+                    } else {
+                        sb.append("O ");
+                    }
+
+                }
+            }
+            sb.append("  " + i);
+            sb.append("\n");
+        }
+        sb.append("\n0 1 2 3 4 5 6 7");
+         soutUTF8(sb.toString());
+    }
     
     // las celdas blancas son las pares en las filas pares y las impares en las impares
     private static boolean celdaEsBlanca(int col, int fil) {

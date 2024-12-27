@@ -55,13 +55,13 @@ public class Torre extends Pieza {
     public String toString() {
 
         if (estamosEnLinux) {
-            if (color) {
+            if (this.COLOR) {
                 return "\u2656 ";
             } else {
                 return "\u265C ";
             }
         } else {
-            if (color) {
+            if (this.COLOR) {
                 return "Rw";
             } else {
                 return "Rb";
@@ -112,7 +112,7 @@ public class Torre extends Pieza {
             }if (tablero[nuevaFila][nuevaColumna] == null) {
                 // Si el camino esta vacio y la casilla tambien puede moverse
                 return true;
-            }else if (!(tablero[nuevaFila][nuevaColumna].equalsColor(color))) {
+            }else if (!(tablero[nuevaFila][nuevaColumna].equalsColor(this.COLOR))) {
                 // Tambien si hay una ficha del color contrario                 
                 return true;
             }else{
@@ -136,7 +136,7 @@ public class Torre extends Pieza {
             }if (tablero[nuevaFila][nuevaColumna] == null) {
                 // Si el camino esta vacio y la casilla tambien puede moverse
                 return true;
-            }else if (!(tablero[nuevaFila][nuevaColumna].equalsColor(color))) {
+            }else if (!(tablero[nuevaFila][nuevaColumna].equalsColor(this.COLOR))) {
                 // Tambien si hay una ficha del color contrario 
                 return true;
             }else{

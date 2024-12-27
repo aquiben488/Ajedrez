@@ -1,12 +1,11 @@
 package daw;
 
-import Piezas.*;
-// No estan implementados el jaque y el jaque mate 
-// tampoco se ha implementado el enroque, depende del jaque, lo demas funciona
-// tampoco se ha implementado el peon que se convierte en otra pieza
+import Piezas.*; 
+
+// no esta implementado el jaque mate\
+// ni el rey ahogado
+// tampoco se ha implementado el peon que se convierte en otra pieza (promocion)
 // ni la captura al paso (en passant)
-// ni las piezas clavadas X
-// no se como va a reaccionar un rey contra otro rey X
 
 
 public class Ajedrez {
