@@ -3,6 +3,9 @@ package Piezas;
 import daw.Utiles;
 
 public class Reina extends Pieza {
+    // Atributos para delegar los movimientos
+    private Torre movimientosTorre;
+    private Alfil movimientosAlfil;
 
     @Override
     public String getNombre() {
@@ -62,6 +65,9 @@ public static void main(String[] args) throws Exception {
     }
     public Reina(boolean color, int fila, int columna) {
         super(color, fila, columna);
+        // Inicializamos las piezas auxiliares con la misma posición y color
+        this.movimientosTorre = new Torre(color, fila, columna);
+        this.movimientosAlfil = new Alfil(color, fila, columna);
     }
 
     @Override
@@ -80,108 +86,30 @@ public static void main(String[] args) throws Exception {
                 return "Qb";
             }
         }
-
     }
 
     @Override
     public boolean esMovimientoValido(Pieza[][] tablero, Posicion nuevaPosicion) {
-
         if (!movimientoFactible(tablero, nuevaPosicion)) {
             return false;
         }
 
-        int nuevaFila = nuevaPosicion.getFila();
-        int nuevaColumna = nuevaPosicion.getColumna();
+        int difColAbsoluta = Math.abs(nuevaPosicion.getColumna() - this.getColumna());
+        int difFilAbsoluta = Math.abs(nuevaPosicion.getFila() - this.getFila());
 
-        int columnaAComprobar;
-        int filaAComprobar;
+        // Actualizamos la posición de las piezas auxiliares
+        movimientosTorre.setPosicion(this.getFila(), this.getColumna());
+        movimientosAlfil.setPosicion(this.getFila(), this.getColumna());
 
-        int diferenciaFil = nuevaPosicion.getFila() - this.getFila();
-        int diferenciaCol = nuevaPosicion.getColumna() - this.getColumna();
-
-        int difColAbsoluta = Math.abs(diferenciaCol);
-        int difFilAbsoluta = Math.abs(diferenciaFil);
-        // Torre
-
-        // Si llega aqui el movimiento es factible, solo queda saber si es legal
-        // Necesitamos saber si esta en linea recta
-
+        // Si se mueve en línea recta (como Torre)
         if (difColAbsoluta == 0 || difFilAbsoluta == 0) {
-            if (difColAbsoluta == 0) {
-                // Se mueve en el eje Y
-                int signoMovimiento = (int) Math.signum(diferenciaFil);
-
-                for (int i = 1; i < difFilAbsoluta; i++) {
-
-                    filaAComprobar = this.getFila() + i * signoMovimiento;
-
-                    if (tablero[filaAComprobar][this.getColumna()] != null) {
-                        // Comprobamos todas las casillas hasta la penultima
-                        // y si no estan vacias no puede moverse
-                        return false;
-                    }
-                }
-                if (tablero[nuevaFila][nuevaColumna] == null) {
-                    // Si el camino esta vacio y la casilla tambien puede moverse
-                    return true;
-                } else if (!(tablero[nuevaFila][nuevaColumna].equalsColor(this.COLOR))) {
-                    // Tambien si hay una ficha del color contrario
-                    return true;
-                } else {
-                    return false;
-                }
-
-            } else if (difFilAbsoluta == 0) {
-                // Se mueve en el eje X
-                int signoMovimiento = (int) Math.signum(diferenciaCol);
-
-                for (int i = 1; i < difColAbsoluta; i++) {
-
-                    columnaAComprobar = this.getColumna() + i * signoMovimiento;
-
-                    if (tablero[this.getFila()][columnaAComprobar] != null) {
-                        // Comprobamos todas las casillas hasta la penultima
-                        // y si no estan vacias no puede moverse
-                        return false;
-                    }
-                }
-                if (tablero[nuevaFila][nuevaColumna] == null) {
-                    // Si el camino esta vacio y la casilla tambien puede moverse
-                    return true;
-                } else if (!(tablero[nuevaFila][nuevaColumna].equalsColor(this.COLOR))) {
-                    // Tambien si hay una ficha del color contrario
-                    return true;
-                } 
-            }
-
-        } else if (difColAbsoluta == difFilAbsoluta) {
-            // Alfil
-
-            // Sigue la misma logica que el alfil
-            int signoCol = (int) Math.signum(diferenciaCol);
-            int signoFil = (int) Math.signum(diferenciaFil);
-
-            for (int i = 1; i < Math.abs(diferenciaCol); i++) {
-
-                // con esto calculamos la posicion que debemos comprobar
-                columnaAComprobar = this.getColumna() + (i * signoCol);
-                filaAComprobar = this.getFila() + (i * signoFil);
-
-                if (tablero[filaAComprobar][columnaAComprobar] != null) {
-                    return false;
-                }
-            }
-
-            // Comprobamos la casilla final
-            if (tablero[nuevaPosicion.getFila()][nuevaPosicion.getColumna()] == null) {
-                return true;
-            } else if (!tablero[nuevaPosicion.getFila()][nuevaPosicion.getColumna()].equalsColor(this.COLOR)) {
-                return true;
-            }
-        } 
-            return false;
+            return movimientosTorre.esMovimientoValido(tablero, nuevaPosicion);
+        }
+        // Si se mueve en diagonal (como Alfil)
+        else if (difColAbsoluta == difFilAbsoluta) {
+            return movimientosAlfil.esMovimientoValido(tablero, nuevaPosicion);
+        }
         
+        return false;
     }
-
-    
 }
