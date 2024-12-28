@@ -76,3 +76,11 @@ nbdist/
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,netbeans,java,mave
+/target
+/.vscode
+/target
+*.class
+*.class
+/target
+*.lst
+*.lst
