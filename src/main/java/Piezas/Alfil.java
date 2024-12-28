@@ -64,15 +64,14 @@ public class Alfil extends Pieza{
         
         int diferenciaFil = nuevaPosicion.getFila() - this.getFila();
         int diferenciaCol = nuevaPosicion.getColumna() - this.getColumna();
+
+        int nuevaFila = nuevaPosicion.getFila();
+        int nuevaColumna = nuevaPosicion.getColumna();
         
         // Comprobamos que el movimiento es diagonal
         if (Math.abs(diferenciaCol) != Math.abs(diferenciaFil)) {
             return false;
         }
-        
-        // Si llega aqui, en princio el movimiento es valido a no ser que haya 
-        // alguna pieza en medio, para comprobarlo tenemos que comprobar todas
-        // las casillas de en medio
         
         // necesitamos el signo de la diferencia ya que 
         // con ello sabemos en que diagonal va a moverse
@@ -97,13 +96,15 @@ public class Alfil extends Pieza{
         }
         
         // Comprobamos la casilla final
-        if (tablero[nuevaPosicion.getFila()][nuevaPosicion.getColumna()] == null) {
+        if (tablero[nuevaFila][nuevaColumna] == null) {
+            // Si el camino esta vacio y la casilla tambien puede moverse
             return true;
-        } else if (!tablero[nuevaPosicion.getFila()][nuevaPosicion.getColumna()].equalsColor(this.COLOR)) {
+        } else if (!(tablero[nuevaFila][nuevaColumna].equalsColor(this.COLOR))) {
+            // Tambien si hay una ficha del color contrario                 
             return true;
+        } else {
+            return false;
         }
-        
-        return false;
     }
     
     @Override

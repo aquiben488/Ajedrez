@@ -76,7 +76,8 @@ public class Peon extends Pieza {
         if (((int) Math.signum(diferenciaFilas)) != signoMovimiento) {
             // se esta moviendo para atras
             return false;
-        }else if (diferenciaColumnas == 0) {
+        }
+        if (diferenciaColumnas == 0) {
             
             // Si entra significa que el peon no va a comer piezas (esta en su misma columna)
             if (Math.abs(diferenciaFilas) > 2) {
