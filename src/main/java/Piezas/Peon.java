@@ -63,10 +63,6 @@ public class Peon extends Pieza {
             return false;
         }
         
-        // si llegamos aqui, en principio el movimiento es factible
-        // no esta clavada, la posicion esta dentro del tablero y no es la misma 
-        // en la que ya esta la propia pieza
-        // ahora debemos comprobar que el movimiento es posible por la propia pieza
         // Si es blanca suma en filas, si es negra resta
         int signoMovimiento = (this.COLOR) ? (1) : (-1);
         int diferenciaFilas = nuevaPosicion.getFila() - this.getFila();
@@ -104,24 +100,44 @@ public class Peon extends Pieza {
                 }
 
             }
-            
+        }   
         // Si entra aqui significa que el peon se mueve uno en diagonal hacia delante
-        } else if (Math.abs(diferenciaColumnas) == 1 && Math.abs(diferenciaFilas) == 1) {
+        if (Math.abs(diferenciaColumnas) == 1 && Math.abs(diferenciaFilas) == 1) {
             
             if (tablero[nuevaPosicion.getFila()][nuevaPosicion.getColumna()] == null) {
                 // La casilla esta vacia
                 return false;
-            }else if (!(tablero[nuevaPosicion.getFila()][nuevaPosicion.getColumna()].equalsColor(this.COLOR))) {
+            }
+            if (!(tablero[nuevaPosicion.getFila()][nuevaPosicion.getColumna()].equalsColor(this.COLOR))) {
                 // La casilla esta ocupada por una pieza de disatinto color
                 return true;
-            }else{
-                return false;
             }
-        } else {
-            return false;
         }
+        return false;
     }
 
+    public boolean esMovimientoValidoCapturaAlPaso(Pieza[][] tablero, Posicion nuevaPosicion, Posicion posicionCapturaAlPaso) {
+
+        
+        int diferenciaFilasCaptura = posicionCapturaAlPaso.getFila() - this.getFila();
+        int diferenciaColumnasCaptura = posicionCapturaAlPaso.getColumna() - this.getColumna();
+
+        // Blanco suma negro resta
+        int signoMovimiento = (this.COLOR) ? (1) : (-1);
+
+       // Para que pueda darse la captura al paso, el peon debe estar en la misma fila y a una columna de distancia
+        if (Math.abs(diferenciaColumnasCaptura) != 1 || diferenciaFilasCaptura != 0) {
+            return false;
+        }
+        // Si el peon se mueve a la casilla anterior a la del peon capturado (dependiendo del color) 
+        // y a la misma columna, se puede dar la captura al paso
+        if (nuevaPosicion.getFila() == posicionCapturaAlPaso.getFila() + signoMovimiento 
+            && nuevaPosicion.getColumna() == posicionCapturaAlPaso.getColumna()) {
+            return true;
+        }
+        return false;
+
+    }
     @Override
     public String toString() {
 
