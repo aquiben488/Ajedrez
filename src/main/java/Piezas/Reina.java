@@ -109,7 +109,6 @@ public static void main(String[] args) throws Exception {
         else if (difColAbsoluta == difFilAbsoluta) {
             return movimientosAlfil.esMovimientoValido(tablero, nuevaPosicion);
         }
-        
         return false;
     }
 }

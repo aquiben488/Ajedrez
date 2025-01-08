@@ -121,6 +121,10 @@ public abstract class Pieza {
         return color == this.COLOR;
     }
 
+    public boolean getColor() {
+        return this.COLOR;
+    }
+
     public void setPosicion(Posicion posicion) {
         this.posicion = posicion;
     }
@@ -166,7 +170,6 @@ public abstract class Pieza {
     
     public void mover(Pieza[][] tablero, Posicion nuevaPosicion) {
 
-        if (this.esMovimientoValido(tablero, nuevaPosicion)) {
             // Eliminamos la pieza de su posicion actual    
             tablero[this.getFila()][this.getColumna()] = null;
             // Movemos la pieza a la nueva posicion
@@ -174,11 +177,7 @@ public abstract class Pieza {
             // Indicamos que la pieza ya no es la primera vez que se mueve
             this.noSeHaMovido = false;
             // Movemos la pieza a la nueva posicion
-            tablero[this.getFila()][this.getColumna()] = this;
-        }
-        else {
-            throw new IllegalArgumentException("Movimiento no valido");
-        }   
+            tablero[this.getFila()][this.getColumna()] = this; 
 
     }
 
@@ -227,6 +226,5 @@ public abstract class Pieza {
         }
         return false;
     }
-    
 }
 

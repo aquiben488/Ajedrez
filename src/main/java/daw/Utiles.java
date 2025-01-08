@@ -65,12 +65,8 @@ public class Utiles {
     
     // las celdas blancas son las pares en las filas pares y las impares en las impares
     private static boolean celdaEsBlanca(int col, int fil) {
-
-        if (col % 2 == 0) {
-            return fil % 2 == 0;
-        } else {
-            return fil % 2 == 1;
-        }
+        return col % 2 == 0 ? fil % 2 == 0 : fil % 2 == 1;
+        
     }
     
     public static void soutUTF8(String text) throws Exception {

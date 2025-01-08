@@ -92,16 +92,17 @@ public class Caballo extends Pieza {
             // Si la suma de las diferencias es distinto de 3 
             // es imposible que haga una L
             return false;
-        }else if (difColAbsoluta == 3 || difFilAbsoluta == 3) {
+        } 
+        if (difColAbsoluta == 3 || difFilAbsoluta == 3) {
             // Si alguno de estos es igual a 3 significa que no hace una L
             // hace una linea recta
             return false;  
-        }else if (tablero[nuevaFila][nuevaColumna] == null) {
+        }
+        if (tablero[nuevaFila][nuevaColumna] == null || !(tablero[nuevaFila][nuevaColumna].equalsColor(this.COLOR))) {
             return true;
-        }else if (!(tablero[nuevaFila][nuevaColumna].equalsColor(this.COLOR))) {
-            return true;
-        }else{
-            return false;
-        }     
+        }
+        
+        return false;
+             
     }
 }
