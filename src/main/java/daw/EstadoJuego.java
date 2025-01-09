@@ -52,7 +52,7 @@ public enum EstadoJuego {
         return this.mensaje;
     }
 
-    public Boolean esTurnoBlancas() {
+    public Boolean colorTurno() {
         return this.turno;
     }
 
