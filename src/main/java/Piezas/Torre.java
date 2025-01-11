@@ -95,7 +95,7 @@ public class Torre extends Pieza {
             return false;
         }
         // Como el movimiento es en linea recta, solo hay que comprobar si hay piezas en el camino, 
-        //ya sea vertical u horizontal
+        // ya sea vertical u horizontal
         boolean movimientoIntermedioValido = (diferenciaFilas == 0) ? 
             comprobarMovimiento(tablero, diferenciaColumnas, false) : 
             comprobarMovimiento(tablero, diferenciaFilas, true);

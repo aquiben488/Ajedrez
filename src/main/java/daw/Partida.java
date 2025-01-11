@@ -1,5 +1,7 @@
 package daw;
 
+import java.util.ArrayList;
+
 import Piezas.*;
 
 public class Partida {
@@ -135,10 +137,8 @@ public class Partida {
         // tengo que meter esas piezas en una lista y comprobar con todas mis piezas las casillas intermedias (menos si es un caballo)
 
         boolean jaque = hayNuevoJaque(reyContrario.getPosicion());
-
-        boolean elReyContrarioPuedeMoverse = elReyContrarioPuedeMoverse(reyContrario);
-        boolean jaqueMate =  (jaque) ? elReyContrarioPuedeMoverse : false;
-        boolean reyAhogado = (elReyContrarioPuedeMoverse) ? hayReyAhogado(reyContrario.getPosicion()) : false;
+        boolean jaqueMate =  (jaque) ? hayJaqueMate(reyContrario) : false;
+        boolean reyAhogado = (jaque) ? false : comprobarReyAhogado();
 
         estadoActual = estadoActual.siguienteTurno(jaque, jaqueMate, reyAhogado);
     }
@@ -163,14 +163,14 @@ public class Partida {
         return false;
     }
 
-    // Comprueba si el jaque mate se ha producido
-    private boolean elReyContrarioPuedeMoverse(Pieza reyContrario) {
-
-        // Comprobamos si el rey del otro color puede moverse a ninguna posicion adyacente
+    
+    private boolean hayJaqueMate(Pieza reyContrario) {
 
         Posicion posicionReyContrario = reyContrario.getPosicion();
         Posicion posicionAdyacente = null;
 
+        // Comprobamos si el rey del otro color puede moverse a ninguna posicion adyacente
+        // Si puede moverse a alguna, no hay jaque mate
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 posicionAdyacente = new Posicion(posicionReyContrario.getFila() + i, posicionReyContrario.getColumna() + j);
@@ -180,9 +180,151 @@ public class Partida {
                 }
             }
         }
-        return true;
+        
 
-    }
+        ArrayList<Pieza> piezasPuedenComerRey = new ArrayList<>();
+        ArrayList<Posicion> PosicionesQuePuedenBloquearJaque = new ArrayList<>();
+
+        // Comprobamos si hay una pieza que pueda comer al rey del otro color
+        // Si hay una pieza que pueda comer al rey tenemos que comprobar que no haya una pieza que pueda bloquear el jaque
+        // Si hay 2 piezas que puedan comer al rey, entonces ese jaque no se puede bloquear
+        for (Pieza[] fila : tablero) {
+            for (Pieza pieza : fila) {
+                // Comprobamos que no sea null y que no sea de nuestro color y que no sea un rey (ya que no puede comer al rey)
+                if (pieza != null && pieza.equalsColor(estadoActual.colorTurno()) && !(pieza instanceof Rey)) {
+                    // Comprobamos que la pieza pueda comer al rey
+                    if (pieza.esMovimientoValido(tablero, posicionReyContrario)) {
+                        piezasPuedenComerRey.add(pieza);
+                    }  
+                }
+            }
+        }
+
+        // Si hay 2 piezas que puedan comer al rey, entonces ese jaque no se puede bloquear, por lo que hay jaque mate
+        if (piezasPuedenComerRey.size() == 2) {
+            return true;
+        }
+// Hay que mirar esto otra vez
+        // Añadimos las posiciones que pueden bloquear el jaque, dependiendo del tipo de pieza
+        PosicionesQuePuedenBloquearJaque = posicionesQuePuedenBloquearJaque(piezasPuedenComerRey, posicionReyContrario);
+
+        // Comprobamos si hay una pieza que pueda bloquear el jaque
+        // Si hay una pieza que pueda bloquear el jaque, no hay jaque mate
+        for (Pieza[] fila : tablero) {
+            for (Pieza pieza : fila) {
+                if (pieza != null && pieza.equalsColor(estadoActual.colorTurno()) && !(pieza instanceof Rey)) {
+                    for (Posicion posicion : PosicionesQuePuedenBloquearJaque) {
+                        if (this.esMovimientoValido(pieza.getPosicion(), posicion)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    } 
+
+    private ArrayList<Posicion> posicionesQuePuedenBloquearJaque(ArrayList<Pieza> piezasPuedenComerRey, Posicion posicionReyContrario) {
+
+        ArrayList<Posicion> PosicionesQuePuedenBloquearJaque = new ArrayList<>();
+
+        // Si es un caballo o un peon, añadimos su posicion solo, ya que no se pueden bloquear
+        // Para el resto debemos añadir todas las posiciones entre esa pieza y el rey
+        for (Pieza pieza : piezasPuedenComerRey) {
+            if (pieza instanceof Caballo) {
+                PosicionesQuePuedenBloquearJaque.add(pieza.getPosicion());
+            } else if (pieza instanceof Peon) {
+                PosicionesQuePuedenBloquearJaque.add(pieza.getPosicion());
+
+            } else if (pieza instanceof Reina) {
+                PosicionesQuePuedenBloquearJaque.add(pieza.getPosicion());
+
+                int diferenciaFil = posicionReyContrario.getFila() - pieza.getFila();
+                int diferenciaCol = posicionReyContrario.getColumna() - pieza.getColumna();
+
+                int signoFil = (int) Math.signum(diferenciaFil);
+                int signoCol = (int) Math.signum(diferenciaCol);
+
+                // Movimiento diagonal (como alfil)
+                if (Math.abs(diferenciaFil) == Math.abs(diferenciaCol)) {
+                    for (int i = 1; i < Math.abs(diferenciaCol); i++) {
+                        PosicionesQuePuedenBloquearJaque.add(new Posicion(
+                            pieza.getFila() + (i * signoFil),
+                            pieza.getColumna() + (i * signoCol)));
+                    }
+                }
+                // Movimiento horizontal/vertical (como torre)
+                else {
+                    boolean movimientoVertical = diferenciaCol == 0;
+                    if (movimientoVertical) {
+                        for (int i = 1; i < Math.abs(diferenciaFil); i++) {
+                            PosicionesQuePuedenBloquearJaque.add(new Posicion(
+                                pieza.getFila() + (i * signoFil),
+                                pieza.getColumna()));
+                        }
+                    } else {
+                        for (int i = 1; i < Math.abs(diferenciaCol); i++) {
+                            PosicionesQuePuedenBloquearJaque.add(new Posicion(
+                                pieza.getFila(),
+                                pieza.getColumna() + (i * signoCol)));
+                        }
+                    }
+                }
+            } else if (pieza instanceof Alfil) {
+                PosicionesQuePuedenBloquearJaque.add(pieza.getPosicion());
+
+                int diferenciaFil = posicionReyContrario.getFila() - pieza.getFila();
+                int diferenciaCol = posicionReyContrario.getColumna() - pieza.getColumna();
+
+                // necesitamos el signo de la diferencia ya que
+                // con ello sabemos en que diagonal va a moverse
+
+                // filas : positivo = va para abajo, negativo = arriba
+                // columnas : positivo = va para la derecha, negativo = izquierda
+                int signoCol = (int) Math.signum(diferenciaCol);
+                int signoFil = (int) Math.signum(diferenciaFil);
+
+                for (int i = 1; i < Math.abs(diferenciaCol); i++) { 
+                    PosicionesQuePuedenBloquearJaque.add(new Posicion(
+                        pieza.getFila() + (i * signoFil), 
+                        pieza.getColumna() + (i * signoCol)));
+                }
+
+            } else if (pieza instanceof Torre) {
+                PosicionesQuePuedenBloquearJaque.add(pieza.getPosicion());
+
+                int diferenciaFil = posicionReyContrario.getFila() - pieza.getFila();
+                int diferenciaCol = posicionReyContrario.getColumna() - pieza.getColumna();
+
+                int signoFil = (int) Math.signum(diferenciaFil);
+                int signoCol = (int) Math.signum(diferenciaCol);
+
+                boolean movimientoVertical = diferenciaCol == 0;
+
+                // Dependiendo de si es vertical o horizontal, añadimos las posiciones que puede bloquear
+                // la posicion original mas el signo de la diferencia
+                if (movimientoVertical) {
+                    for (int i = 1; i < Math.abs(diferenciaFil); i++) { 
+                        PosicionesQuePuedenBloquearJaque.add(new Posicion(
+                            pieza.getFila() + (i * signoFil), 
+                            pieza.getColumna()));
+                    }
+                } else {
+                    for (int i = 1; i < Math.abs(diferenciaCol); i++) { 
+                        PosicionesQuePuedenBloquearJaque.add(new Posicion(
+                            pieza.getFila(), 
+                            pieza.getColumna() + (i * signoCol)));
+                    }
+                }
+            }
+        }
+
+        return PosicionesQuePuedenBloquearJaque;
+
+    }   
+
+    
+    
 
     public Pieza[][] getTablero() {
         return tablero;
