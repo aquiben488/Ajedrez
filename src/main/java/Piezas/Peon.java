@@ -118,7 +118,10 @@ public class Peon extends Pieza {
 
     public boolean esMovimientoValidoCapturaAlPaso(Pieza[][] tablero, Posicion nuevaPosicion, Posicion posicionCapturaAlPaso) {
 
-        
+        if (posicionCapturaAlPaso == null) {
+            return false;
+        }
+
         int diferenciaFilasCaptura = posicionCapturaAlPaso.getFila() - this.getFila();
         int diferenciaColumnasCaptura = posicionCapturaAlPaso.getColumna() - this.getColumna();
 
