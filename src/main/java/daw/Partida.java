@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import Piezas.*;
 
 public class Partida {
+
+    // Actualmente no hay nada de interfaz en el codigo, hay que revisarlo una vez se implemente
     
     //Atributos
     private Pieza[][] tablero;
     private EstadoJuego estadoActual;
     private Posicion PosicionCapturaAlPaso = null;
-    private boolean haHabidoCapturaAlPaso = false;
+    
 
     //Constructor
     public Partida() {
@@ -55,26 +57,26 @@ public class Partida {
         if (pieza == null) {
             return false;
         }
-        if (this.estadoActual.puedeJugar(pieza.getColor())) {
+        if (!this.estadoActual.puedeJugar(pieza.getColor())) {
+            return false;
+        }
 
         if (pieza instanceof Peon) {
-            if (((Peon)pieza).esMovimientoValidoCapturaAlPaso(tablero, destino, PosicionCapturaAlPaso)) {
-                haHabidoCapturaAlPaso = true;
+            if (((Peon) pieza).esMovimientoValidoCapturaAlPaso(tablero, destino, PosicionCapturaAlPaso)) {
                 return true;
             }
         }
-    }
         return pieza.esMovimientoValido(tablero, destino);
-    
+
     }
     
     public void realizarMovimiento(Posicion origen, Posicion destino) {
 
         Pieza pieza = tablero[origen.getFila()][origen.getColumna()];
+
         // Si ha habido captura al paso, se elimina la pieza capturada
-        if (haHabidoCapturaAlPaso) {
+        if (((Peon) pieza).esMovimientoValidoCapturaAlPaso(tablero, destino, PosicionCapturaAlPaso)) {
             tablero[PosicionCapturaAlPaso.getFila()][PosicionCapturaAlPaso.getColumna()] = null;
-            haHabidoCapturaAlPaso = false;
         }
 
         // Actualizamos la posicion de la captura al paso (si no ha habido es null)
@@ -131,27 +133,36 @@ public class Partida {
             }
         }
 
-        // Esto no funciona ya que para comprobar si hay jaque mate, necesitamos saber si el rey del otro color puede moverse
-        // y ademas si no hay ninguna pieza que pueda bloquear el jaque
-        // tengo que comprobar que pieza puede comer al rey del otro color y que pieza puede bloquear el jaque
-        // tengo que meter esas piezas en una lista y comprobar con todas mis piezas las casillas intermedias (menos si es un caballo)
-
         boolean jaque = hayNuevoJaque(reyContrario.getPosicion());
         boolean jaqueMate =  (jaque) ? hayJaqueMate(reyContrario) : false;
-        boolean reyAhogado = (jaque) ? false : comprobarReyAhogado();
-
+        boolean reyAhogado = (jaque) ? false : hayReyAhogado();
+        
+        // Actualizar movimientos posibles de todas las piezas del color que le toca
+        actualizarMovimientosPosibles();
+        
+        // Actualizar estado de la partida
         estadoActual = estadoActual.siguienteTurno(jaque, jaqueMate, reyAhogado);
+
+        
+    }
+
+    private void actualizarMovimientosPosibles() {
+        for (Pieza[] fila : tablero) {
+            for (Pieza pieza : fila) {
+                if (pieza != null && !pieza.equalsColor(estadoActual.colorTurno())) {
+                    pieza.setMovimientosPosibles(getMovimientosPosibles(pieza));
+                }
+            }
+        }
     }
 
     // Comprueba si un nuevo jaque se ha producido
     private boolean hayNuevoJaque(Posicion posicionReyContrario) {
 
-        
-
         // Comprobamos si hay una pieza que pueda comer al rey del otro color
         for (Pieza[] fila : tablero) {
             for (Pieza pieza : fila) {
-                // Comprobamos que no sea null y que no sea de nuestro color y que no sea un rey
+                // Comprobamos que no sea null y que sea de nuestro color y que no sea un rey
                 if (pieza != null && pieza.equalsColor(estadoActual.colorTurno()) && !(pieza instanceof Rey)) {
                     // Comprobamos que la pieza pueda comer al rey
                     if (pieza.esMovimientoValido(tablero, posicionReyContrario)) {
@@ -185,7 +196,7 @@ public class Partida {
         ArrayList<Pieza> piezasPuedenComerRey = new ArrayList<>();
         ArrayList<Posicion> PosicionesQuePuedenBloquearJaque = new ArrayList<>();
 
-        // Comprobamos si hay una pieza que pueda comer al rey del otro color
+        // Comprobamos si hay una pieza que pueda comer al rey del otro color (si llega aqui se supone que si)
         // Si hay una pieza que pueda comer al rey tenemos que comprobar que no haya una pieza que pueda bloquear el jaque
         // Si hay 2 piezas que puedan comer al rey, entonces ese jaque no se puede bloquear
         for (Pieza[] fila : tablero) {
@@ -204,7 +215,7 @@ public class Partida {
         if (piezasPuedenComerRey.size() == 2) {
             return true;
         }
-// Hay que mirar esto otra vez
+        // Hay que mirar esto otra vez
         // Añadimos las posiciones que pueden bloquear el jaque, dependiendo del tipo de pieza
         PosicionesQuePuedenBloquearJaque = posicionesQuePuedenBloquearJaque(piezasPuedenComerRey, posicionReyContrario);
 
@@ -212,7 +223,7 @@ public class Partida {
         // Si hay una pieza que pueda bloquear el jaque, no hay jaque mate
         for (Pieza[] fila : tablero) {
             for (Pieza pieza : fila) {
-                if (pieza != null && pieza.equalsColor(estadoActual.colorTurno()) && !(pieza instanceof Rey)) {
+                if (pieza != null && !pieza.equalsColor(estadoActual.colorTurno()) && !(pieza instanceof Rey)) {
                     for (Posicion posicion : PosicionesQuePuedenBloquearJaque) {
                         if (this.esMovimientoValido(pieza.getPosicion(), posicion)) {
                             return false;
@@ -224,6 +235,8 @@ public class Partida {
         return true;
     } 
 
+    // este metodo obtiene una lista de posiciones que pueden bloquear el jaque, es decir, 
+    // que de poner una pieza en esas posiciones deja de haber jaque
     private ArrayList<Posicion> posicionesQuePuedenBloquearJaque(ArrayList<Pieza> piezasPuedenComerRey, Posicion posicionReyContrario) {
 
         ArrayList<Posicion> PosicionesQuePuedenBloquearJaque = new ArrayList<>();
@@ -323,8 +336,22 @@ public class Partida {
 
     }   
 
-    
-    
+    private boolean hayReyAhogado() {
+
+        // hay rey ahogado si hay jaque y no hay ningun movimiento posible por ninguna pieza de nuestro color
+        // en principio si se llega aqui es por que no hay jaque
+
+        for (Pieza[] fila : tablero) {
+            for (Pieza pieza : fila) {
+                if (pieza != null && !pieza.equalsColor(estadoActual.colorTurno())) {
+                    if (pieza.getMovimientosPosibles().size() > 0) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
 
     public Pieza[][] getTablero() {
         return tablero;
@@ -346,4 +373,157 @@ public class Partida {
         return estadoActual.esFinDelJuego();
     }
 
+    public ArrayList<Posicion> getMovimientosPosibles(Pieza pieza) {
+
+        ArrayList<Posicion> movimientosPosibles = new ArrayList<>();
+        
+        if (pieza instanceof Rey) {
+            getMovimientosRey(pieza, movimientosPosibles);
+
+        }else if (pieza instanceof Caballo) {
+            getMovimientosCaballo(pieza, movimientosPosibles);
+
+        }else if (pieza instanceof Peon) {
+            getMovimientosPeon(pieza, movimientosPosibles);
+
+        }else if (pieza instanceof Alfil || pieza instanceof Reina) {
+            getMovimientosDiagonales(pieza, movimientosPosibles);
+
+        }
+        
+        if (pieza instanceof Torre || pieza instanceof Reina) {
+            getMovimientosRectos(pieza, movimientosPosibles);
+        }
+        
+        return movimientosPosibles;
+    }
+
+    private void getMovimientosRey(Pieza pieza, ArrayList<Posicion> movimientosPosibles) {
+        int fila = pieza.getFila();
+        int columna = pieza.getColumna();
+        Posicion posicion = pieza.getPosicion();
+        Posicion nuevaPosicion;
+
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                nuevaPosicion = new Posicion(fila + i, columna + j);
+                if (this.esMovimientoValido(posicion, nuevaPosicion)) {
+                    movimientosPosibles.add(nuevaPosicion);
+                }
+            }
+        }
+    }
+
+    private void getMovimientosCaballo(Pieza pieza, ArrayList<Posicion> movimientosPosibles) {
+        int fila = pieza.getFila();
+        int columna = pieza.getColumna();
+        Posicion posicion = pieza.getPosicion();
+        Posicion nuevaPosicion;
+        
+        int[] movimientosCaballo = {-2, -1, 1, 2};
+        for (int movFil : movimientosCaballo) {
+            for (int movCol : movimientosCaballo) {
+                // Comprobamos que la suma de los movimientos sea 3, ya que el caballo se mueve en L
+                if (Math.abs(movFil) + Math.abs(movCol) == 3) {
+                    nuevaPosicion = new Posicion(fila + movFil, columna + movCol);
+                    if (this.esMovimientoValido(posicion, nuevaPosicion)) {
+                        movimientosPosibles.add(nuevaPosicion);
+                    }
+                }
+            }
+        }
+    }
+
+    private void getMovimientosPeon(Pieza pieza, ArrayList<Posicion> movimientosPosibles) {
+        int fila = pieza.getFila();
+        int columna = pieza.getColumna();
+        Posicion posicion = pieza.getPosicion();
+        int sentido = pieza.getColor() ? 1 : -1;
+
+        // solo hay 4 posibles movimientos, podria hacerse algo mas legible, pero esto es lo mas directo posible
+        if (this.esMovimientoValido(posicion, new Posicion(fila + sentido, columna))) {
+            movimientosPosibles.add(new Posicion(fila + sentido, columna));
+        }
+        if (this.esMovimientoValido(posicion, new Posicion(fila + sentido * 2, columna))) {
+            movimientosPosibles.add(new Posicion(fila + sentido * 2, columna));
+        }
+        if (this.esMovimientoValido(posicion, new Posicion(fila + sentido, columna + 1))) {
+            movimientosPosibles.add(new Posicion(fila + sentido, columna + 1));
+        }
+        if (this.esMovimientoValido(posicion, new Posicion(fila + sentido, columna - 1))) {
+            movimientosPosibles.add(new Posicion(fila + sentido, columna - 1));
+        }
+    }
+
+    private void getMovimientosDiagonales(Pieza pieza, ArrayList<Posicion> movimientosPosibles) {
+        int fila = pieza.getFila();
+        int columna = pieza.getColumna();
+        Posicion posicion = pieza.getPosicion();
+        int nuevaFila;
+        int nuevaColumna;
+        Posicion nuevaPosicion;
+        
+        int[] direcciones = {-1, 1};
+        for (int dirFil : direcciones) {
+            for (int dirCol : direcciones) {
+                for (int i = 1; i < 8; i++) {
+                    nuevaFila = fila + (i * dirFil);
+                    nuevaColumna = columna + (i * dirCol);
+                    
+                    if (nuevaFila < 0 || nuevaFila >= 8 || nuevaColumna < 0 || nuevaColumna >= 8) {
+                        break;
+                    }
+                    
+                    nuevaPosicion = new Posicion(nuevaFila, nuevaColumna);
+                    if (this.esMovimientoValido(posicion, nuevaPosicion)) {
+                        movimientosPosibles.add(nuevaPosicion);
+                    }
+                    
+                    if (tablero[nuevaFila][nuevaColumna] != null) {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    private void getMovimientosRectos(Pieza pieza, ArrayList<Posicion> movimientosPosibles) {
+        int fila = pieza.getFila();
+        int columna = pieza.getColumna();
+        Posicion posicion = pieza.getPosicion();
+        int nuevaFila;
+        int nuevaColumna;
+        Posicion nuevaPosicion;
+        
+        int[] direcciones = {-1, 1};
+        
+        // Movimientos verticales
+        for (int dirFil : direcciones) {
+            for (int i = 1; i < 8; i++) {
+                nuevaFila = fila + (i * dirFil);
+                if (nuevaFila < 0 || nuevaFila >= 8) break;
+                
+                nuevaPosicion = new Posicion(nuevaFila, columna);
+                if (this.esMovimientoValido(posicion, nuevaPosicion)) {
+                    movimientosPosibles.add(nuevaPosicion);
+                }
+                if (tablero[nuevaFila][columna] != null) break;
+            }
+        }
+        
+        // Movimientos horizontales
+        for (int dirCol : direcciones) {
+            for (int i = 1; i < 8; i++) {
+                nuevaColumna = columna + (i * dirCol);
+                if (nuevaColumna < 0 || nuevaColumna >= 8) break;
+                
+                nuevaPosicion = new Posicion(fila, nuevaColumna);
+                if (this.esMovimientoValido(posicion, nuevaPosicion)) {
+                    movimientosPosibles.add(nuevaPosicion);
+                }
+                if (tablero[fila][nuevaColumna] != null) break;
+            }
+        }
+    }
 }
+
