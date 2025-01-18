@@ -1,6 +1,7 @@
 package Piezas;
 
 import daw.Utiles;
+import java.util.ArrayList;
 
 // Pieza es una clase abtracta que sirve como plantilla para las demas piezas
 public abstract class Pieza {
@@ -81,6 +82,16 @@ public abstract class Pieza {
     
     // Flag para evitar la recursión infinita en la comprobación de piezas clavadas (deja al rey en jaque)
     private boolean verificandoJaque = false;
+    
+    private ArrayList<Posicion> movimientosPosibles;
+
+    public ArrayList<Posicion> getMovimientosPosibles() {
+        return movimientosPosibles;
+    }
+
+    public void setMovimientosPosibles(ArrayList<Posicion> movimientosPosibles) {
+        this.movimientosPosibles = movimientosPosibles;
+    }
     
     public abstract String getNombre();
     
